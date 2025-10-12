@@ -1,0 +1,6 @@
+# Di dalam file requirements.txt
+Flask
+numpy
+pandas
+matplotlib
+sqlite3

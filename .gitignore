@@ -1,0 +1,11 @@
+# Di dalam file .gitignore
+# Environments
+venv/
+__pycache__/
+
+# Logika Python
+*.pyc
+
+# Database dan Output
+data/*.csv
+*.db
