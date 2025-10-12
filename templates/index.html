@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Input Regresi Matriks</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        textarea { width: 90%; min-height: 100px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
+        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        button:hover { background-color: #0056b3; }
+        h1 { color: #333; }
+    </style>
+</head>
+<body>
+    <h1>Aplikasi Regresi Linear Berbasis Matriks</h1>
+    <p>Masukkan data variabel X (fitur) dan Y (target) yang dipisahkan oleh koma.</p>
+
+    <form method="POST" action="{{ url_for('calculate') }}">
+        
+        <label for="X_data">Data Variabel X (Fitur):</label><br>
+        <textarea id="X_data" name="X_data" required 
+            placeholder="Contoh: 1.0, 2.5, 3.0, 4.5, 5.0"></textarea><br><br>
+        
+        <label for="y_data">Data Variabel Y (Target):</label><br>
+        <textarea id="y_data" name="y_data" required
+            placeholder="Contoh: 5.2, 7.8, 8.5, 12.0, 13.1"></textarea><br><br>
+        
+        <button type="submit">Hitung dan Visualisasikan</button>
+    </form>
+    
+    <p><small>Pastikan jumlah titik data X dan Y sama untuk kalkulasi yang valid.</small></p>
+</body>
+</html>
