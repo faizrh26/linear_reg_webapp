@@ -56,9 +56,6 @@ def calculate():
             uploaded_file, x_col_index, y_col_index
         )
 
-        # Pisahkan X_original untuk plotting (tanpa kolom intercept)
-        X_original = X_with_intercept[:, 1].reshape(-1, 1)
-
     except Exception as e:
         # Tangkap semua error terkait I/O dan input
         return render_template('result.html', error=f"Kesalahan Input/File: {e}")
