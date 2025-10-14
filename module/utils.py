@@ -30,11 +30,11 @@ def read_matrix_from_file(file_stream, x_col_index, y_col_index):
         y_vector = df.iloc[:, y_col_index].values.astype(float)
 
         # Tambahkan kolom intercept (array berisi 1)
-        X_matrix_with_intercept = np.hstack([np.ones(X_original.shape), X_original])
-        if X_matrix_with_intercept.shape[0] != y_vector.shape[0]:
-             raise ValueError("Jumlah baris X dan Y tidak cocok setelah pembacaan.")
+        # X_matrix_with_intercept = np.hstack([np.ones(X_original.shape), X_original])
+        # if X_matrix_with_intercept.shape[0] != y_vector.shape[0]:
+        #     raise ValueError("Jumlah baris X dan Y tidak cocok setelah pembacaan.")
 
-        return X_matrix_with_intercept, y_vector
+        return X_original, y_vector
 
     except Exception as e:
         raise Exception(f"Kesalahan saat memproses file CSV: {e}")
