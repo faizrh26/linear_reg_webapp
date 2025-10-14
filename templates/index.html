@@ -16,16 +16,18 @@
     <h1>Aplikasi Regresi Linear Berbasis Matriks</h1>
     <p>Masukkan data variabel X (fitur) dan Y (target) yang dipisahkan oleh koma.</p>
 
-    <form method="POST" action="{{ url_for('calculate') }}">
-        
-        <label for="X_data">Data Variabel X (Fitur):</label><br>
-        <textarea id="X_data" name="X_data" required 
-            placeholder="Contoh: 1.0, 2.5, 3.0, 4.5, 5.0"></textarea><br><br>
-        
-        <label for="y_data">Data Variabel Y (Target):</label><br>
-        <textarea id="y_data" name="y_data" required
-            placeholder="Contoh: 5.2, 7.8, 8.5, 12.0, 13.1"></textarea><br><br>
-        
+    <form method="POST" action="{{ url_for('calculate') }}" enctype="multipart/form-data">
+    
+        <label for="csv_file">Pilih File CSV Data (Hanya satu fitur X dan satu target Y):</label><br>
+    
+        <input type="file" id="csv_file" name="csv_file" accept=".csv" required><br><br>
+    
+        <label for="x_col">Indeks Kolom X (Fitur):</label>
+        <input type="number" id="x_col" name="x_col" value="0" required><br><br>
+    
+        <label for="y_col">Indeks Kolom Y (Target):</label>
+        <input type="number" id="y_col" name="y_col" value="1" required><br><br>
+
         <button type="submit">Hitung dan Visualisasikan</button>
     </form>
     
