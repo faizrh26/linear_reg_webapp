@@ -43,18 +43,11 @@ def calculate():
         X_input_str = request.form['X_data']
         y_input_str = request_form['y_data']
 
-        X_list = [float(x.strip()) for x in X_input_str.split(',')]
-        y_list = [float(y.strip()) for y in y_input_str.split(',')]
+        # 1. Panggil fungsi utilitas I/O yang sudah final
+        X_with_intercept, y_processed = read_matrix_from_text(X_input_str, y_input_str)
+        # Pisahkan kembali X_original untuk plotting (tanpa intercept)
+        X_original = X_with_intercept[:, 1].reshape(-1, 1)
 
-        X_original = np.array(X_list).reshape(-1, 1) # Data asli X (untuk Plot)
-        y_processed = np.array(y_list)
-
-        X_with_intercept = np.hstack([np.ones(X_original.shape), X_original])
-
-    except Exception as e:
-        return render_template('result.html', error=f'Input tidak valid. Detail error: {e}')
-
-    try:
         # Panggil fungsi matriks -- menunggu development selesai
         beta, y_pred, mse = fit_and_predict(X_with_intercept, y_processed)
 
