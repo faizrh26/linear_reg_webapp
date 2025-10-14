@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Regresi</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .error { color: red; border: 1px solid red; padding: 10px; border-radius: 5px; }
+        .success { color: green; font-weight: bold; }
+        .result-box { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
+        .formula { font-size: 1.5em; font-weight: bold; color: #007bff; }
+        img { max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 5px; }
+    </style>
+</head>
+<body>
+    <h1>Hasil Kalkulasi Regresi Linear</h1>
+
+    {% if error %}
+        <div class="error">
+            <h2>Kesalahan Kalkulasi</h2>
+            <p>Aplikasi mengalami masalah:</p>
+            <p>{{ error }}</p>
+        </div>
+    {% else %}
+    <div class="result-box">
+            <h2>Persamaan Regresi yang Didapatkan</h2>
+            <p class="formula">{{ rumus_regresi }}</p>
+
+            <p><strong>Koefisien Intercept ($\beta_0$):</strong> {{ beta_intercept|round(4) }}</p>
+            <p><strong>Koefisien Slope/X ($\beta_1$):</strong> {{ beta_slope|round(4) }}</p>
+            <p><strong>Mean Squared Error (MSE):</strong> {{ mse|round(4) }}</p>
+        </div>
+
+        <h2>Visualisasi Model</h2>
+        <img src="{{ plot_url }}" alt="Grafik Regresi Linear">
+
+        <div class="result-box">
+            <h2>Status Export CSV</h2>
+            {% if export_status %}
+                <p class="success">✅ Data berhasil diekspor ke folder data/regresi_output.csv</p>
+            {% else %}
+                <p class="error">❌ Export CSV gagal. Cek log server/izin folder.</p>
+            {% endif %}
+        </div>
+    
+    {% endif %}
+
+    <br>
+    <a href="{{ url_for('index') }}">← Hitung Data Baru</a>
+</body>
+</html>
