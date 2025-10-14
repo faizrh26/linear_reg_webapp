@@ -35,24 +35,39 @@ def create_plot(X, y, y_pred, beta):
 def index():
     return render_template('index.html')
 
-@app.route('/calculata', methods=['POST'])
+@app.route('/calculate', methods=['POST'])
 def calculate():
     """Endpoint POST: Menerima data, kalkulasi, visualisasi, dan menampilkan hasil."""
-
     try:
-        X_input_str = request.form['X_data']
-        y_input_str = request_form['y_data']
+        # 1. Ambil File dan Metadata
+        uploaded_file = request.files['csv_file']
 
-        # 1. Panggil fungsi utilitas I/O yang sudah final
-        X_with_intercept, y_processed = read_matrix_from_text(X_input_str, y_input_str)
-        # Pisahkan kembali X_original untuk plotting (tanpa intercept)
+        # Ambil indeks kolom dari input form
+        x_col_index = int(request.form['x_col'])
+        y_col_index = int(request.form['y_col'])
+
+        if uploaded_file.filename == '':
+            return redirect(url_for('index')) # Kembali jika tidak ada file
+
+        # 2. Panggil fungsi utilitas untuk membaca data dari stream
+        # Disini file_stream akan menjadi uploaded_file.stream
+        X_with_intercept, y_processed = read_matrix_from_uploaded_file(
+            uploaded_file, x_col_index, y_col_index
+        )
+
+        # Pisahkan X_original untuk plotting (tanpa kolom intercept)
         X_original = X_with_intercept[:, 1].reshape(-1, 1)
 
-        # Panggil fungsi matriks -- menunggu development selesai
+    except Exception as e:
+        # Tangkap semua error terkait I/O dan input
+        return render_template('result.html', error=f"Kesalahan Input/File: {e}")
+
+    # 3. Panggil Modul Kalkulasi (Logika ini tetap sama)
+    try:
         beta, y_pred, mse = fit_and_predict(X_with_intercept, y_processed)
 
     except Exception as e:
-        return render_template('result.html', error=f"Error Modul Kalkulasi. Detail: {e}")
+        return render_template('result.html', error=f"Error Modul Kalkulasi: {e}")
 
     #Visualisasi dan export csv
     plot_url = create_plot(X_original.flatten(), y_processed, y_pred, y_beta)
