@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 # Note: modul masih dalam development sehingga kode masih bisa berubah2
 from .linear_regression import fit_and_predict
 from .data_handler import export_to_csv
+from .utils import read_matrix_from_file
 
 app = Flask(__name__, template_folder='../templates')
 
@@ -51,7 +52,7 @@ def calculate():
 
         # 2. Panggil fungsi utilitas untuk membaca data dari stream
         # Disini file_stream akan menjadi uploaded_file.stream
-        X_with_intercept, y_processed = read_matrix_from_uploaded_file(
+        X_original, y_processed = read_matrix_from_file(
             uploaded_file, x_col_index, y_col_index
         )
 
@@ -64,7 +65,7 @@ def calculate():
 
     # 3. Panggil Modul Kalkulasi (Logika ini tetap sama)
     try:
-        beta, y_pred, mse = fit_and_predict(X_with_intercept, y_processed)
+        beta, y_pred, mse = fit_and_predict(X_original, y_processed)
 
     except Exception as e:
         return render_template('result.html', error=f"Error Modul Kalkulasi: {e}")
