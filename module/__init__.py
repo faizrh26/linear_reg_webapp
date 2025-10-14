@@ -6,7 +6,7 @@ from .matrix_operations import (
     inverse_matrix
 )
 
-from .regression import (
+from .linear_regression import (
     linear_regression,
     predict
 )
