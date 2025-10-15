@@ -5,13 +5,13 @@ from io import StringIO
 import numpy as np
 import pandas as pd
 
-def read_matrix_from_file(file_stream, x_col_index, y_col_index):
+def read_matrix_from_file(file_stream, x_col_indices, y_col_index):
     """
     Membaca data fitur (X) dan target (y) dari file stream yang diunggah.
 
     Args:
         file_stream: Objek file yang dikirim oleh request.files.
-        x_col_index (int): Indeks kolom untuk fitur X.
+        x_col_indices (int): Indeks kolom untuk fitur X.
         y_col_index (int): Indeks kolom untuk target y.
 
     Returns:
@@ -20,15 +20,20 @@ def read_matrix_from_file(file_stream, x_col_index, y_col_index):
     try:
         # Baca file stream langsung menggunakan Pandas
         df = pd.read_csv(file_stream)
-
+        num_cols = len(df.columns)
         # Pastikan indeks yang diminta valid
-        if x_col_index >= len(df.columns) or y_col_index >= len(df.columns):
-            raise IndexError("Indeks kolom melebihi jumlah kolom di file.")
+        if y_col_index >= num_cols or y_col_index < 0:
+            raise IndexError(f"Indeks kolom Y ({y_col_index}) di luar batas kolom.")
+
+        for idx in x_col_indices:
+            if idx >= num_cols or idx < 0:
+                raise IndexError(f"Indeks kolom X ({idx}) di luar batas kolom.")
 
         # Ekstrak kolom X dan y berdasarkan indeks
-        X_original = df.iloc[:, x_col_index].values.astype(float).reshape(-1, 1)
-        y_vector = df.iloc[:, y_col_index].values.astype(float)
+        X_df = df.iloc[:, x_col_indices]
 
+        y_vector = df.iloc[:, y_col_index].values.astype(float)
+        X_original = X_df.values.astype(float)
         # Tambahkan kolom intercept (array berisi 1)
         # X_matrix_with_intercept = np.hstack([np.ones(X_original.shape), X_original])
         # if X_matrix_with_intercept.shape[0] != y_vector.shape[0]:
@@ -37,6 +42,9 @@ def read_matrix_from_file(file_stream, x_col_index, y_col_index):
         return X_original, y_vector
 
     except Exception as e:
+        # penanganan untuk kesalahan Pandas (misal: kolom tidak ditemukan)
+        if isinstance(e, IndexError):
+            raise e
         raise Exception(f"Kesalahan saat memproses file CSV: {e}")
 
 def export_to_csv(data_dict, filename='data/regresi_output.csv'):
