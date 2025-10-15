@@ -39,52 +39,74 @@ def index():
 @app.route('/calculate', methods=['POST'])
 def calculate():
     """Endpoint POST: Menerima data, kalkulasi, visualisasi, dan menampilkan hasil."""
+    # 1. AMBIL DATA FORM DENGAN SAFETY CHECK
+    # Gunakan .get() untuk menghindari KeyError
+    uploaded_file = request.files.get('csv_file')
+    x_cols_str = request.form.get('x_cols')
+    y_col_str = request.form.get('y_col')
+
+    # Cek apakah input form kosong
+    if not x_cols_str or not y_col_str or uploaded_file is None or uploaded_file.filename == '':
+         return render_template('result.html', error="Kesalahan Input/File: Semua input tidak boleh kosong dan file harus diunggah.")
+
+    # 2. KONVERSI DATA DAN I/O
     try:
-        # 1. Ambil File dan Metadata
-        uploaded_file = request.files['csv_file']
+        # Konversi ke integer
+        y_col_index = int(y_col_str)
+        x_col_indices = [int(i.strip()) for i in x_cols_str.split(',')]
 
-        # Ambil indeks kolom dari input form
-        x_col_index = int(request.form['x_col'])
-        y_col_index = int(request.form['y_col'])
-
-        if uploaded_file.filename == '':
-            return redirect(url_for('index')) # Kembali jika tidak ada file
-
-        # 2. Panggil fungsi utilitas untuk membaca data dari stream
-        # Disini file_stream akan menjadi uploaded_file.stream
+        # Panggil fungsi utilitas
         X_original, y_processed = read_matrix_from_file(
-            uploaded_file, x_col_index, y_col_index
+            uploaded_file, x_col_indices, y_col_index
         )
 
-    except Exception as e:
-        # Tangkap semua error terkait I/O dan input
-        return render_template('result.html', error=f"Kesalahan Input/File: {e}")
+    except ValueError as e:
+        # Menangkap error konversi (y_col atau x_cols bukan angka)
+        return render_template('result.html', error=f"Kesalahan Input/File: Indeks kolom harus angka yang valid. ({e})")
 
-    # 3. Panggil Modul Kalkulasi (Logika ini tetap sama)
+    except Exception as e:
+        # Tangkap semua error lain (I/O, File tidak valid, dll.)
+        return render_template('result.html', error=f"Kesalahan I/O: {e}")
+
+    # 3. Panggil Modul Kalkulasi
     try:
+        # X_original dan y_processed PASTI ada di sini jika tidak ada return di atas
         beta, y_pred, mse = fit_and_predict(X_original, y_processed)
 
     except Exception as e:
+        # JALUR KEGAGALAN KALKULASI: HARUS ADA RETURN
         return render_template('result.html', error=f"Error Modul Kalkulasi: {e}")
 
-    #Visualisasi dan export csv
-    plot_url = create_plot(X_original.flatten(), y_processed, y_pred, y_beta)
+    # 4. Visualisasi dan export csv (JALUR SUKSES)
+    # NOTE: Saat Multiple Regression, X_original adalah (N, >1) dimensi. 
+    # create_plot hanya bisa menerima 1D array. Kita pakai fitur pertama (kolom X1) untuk plotting
+    plot_url = create_plot(X_original[:, 0].flatten(), y_processed, y_pred, beta)
 
     export_data = {
-        'X_input': X_original.flatten().tolist(),
+        'X_input_Fitur_Pertama': X_original[:, 0].flatten().tolist(),
         'Y_actual': y_processed.tolist(),
         'Y_Predicted': y_pred.tolist(),
     }
 
+    # Tambahkan semua fitur X ke export_data
+    for i in range(X_original.shape[1]):
+        export_data[f'X_Fitur_{i+1}'] = X_original[:, i].flatten().tolist()
+
     export_success = export_to_csv(export_data, filename='data/regresi_output.csv')
 
-    #Tampilkan Hasil
+    # 5. Tampilkan Hasil (RETURN WAJIB)
+    # Untuk regresi berganda, kita tidak bisa hanya menampilkan beta[1].
+    # Kita harus menampilkan semua koefisien:
+    koefisien_str = f"y = {beta[0]:.4f} (Intercept) "
+    for i in range(1, len(beta)):
+         koefisien_str += f"+ {beta[i]:.4f}x_{i} "
+
     return render_template('result.html',
-                           plot_url=plot_url,
-                           beta_intercept=beta[0],
-                           beta_slope=beta[1],
-                           mse=mse,
-                           export_status=export_success,
-                           rumus_regresi=f"y = {beta[0]:.4f} + {beta[1]:.4f}x")
+                            plot_url=plot_url,
+                            beta_intercept=beta[0],
+                            beta_slope=beta[1], # Masih bisa ditampilkan, tapi hanya untuk fitur pertama
+                            mse=mse,
+                            export_status=export_success,
+                            rumus_regresi=koefisien_str) # <--- INI ADALAH RETURN AKHIR YANG HILANG
 if __name__ == '__main__':
     app.run(debug=Tree)
