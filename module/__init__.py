@@ -14,3 +14,7 @@ from .linear_regression import (
 from .utils import (
     read_matrix_from_file
 )
+
+from .plot_utils import (
+    create_plot
+)
