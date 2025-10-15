@@ -1,7 +1,5 @@
 from flask import Flask, render_template, request
 import numpy as np
-import io, base64
-import matplotlib.pyplot as plt
 
 # Import modul terkait matriks dan regresi linear
 # Note: modul masih dalam development sehingga kode masih bisa berubah2
@@ -9,6 +7,7 @@ from .linear_regression import fit_and_predict
 from .data_handler import export_to_csv
 from .utils import read_matrix_from_file
 from .plot_utils import create_plot
+
 app = Flask(__name__, template_folder='../templates')
 
 @app.route('/')
@@ -111,4 +110,4 @@ def calculate():
                             export_status=export_success,
                             rumus_regresi=koefisien_str) # <--- INI ADALAH RETURN AKHIR YANG HILANG
 if __name__ == '__main__':
-    app.run(debug=Tree)
+    app.run(debug=True)
