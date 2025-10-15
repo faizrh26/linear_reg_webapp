@@ -11,18 +11,22 @@ from .utils import read_matrix_from_file
 
 app = Flask(__name__, template_folder='../templates')
 
-def create_plot(X, y, y_pred, beta):
+def create_plot(X_for_plot, y_actual, beta_intercept_star, beta_slope):
     """Membuat plot Matplotlib dan mengembalikannya sebagai Base64 string."""
     fig, ax = plt.subplots(figsize=(8, 6))
-    ax.scatter(X, y, label='Data Aktual')
+    ax.scatter(X_for_plot, y_actual, label='Data Aktual')
+    X_sorted =np.sort(X_for_plot)
+
+    #Persamaan Regresi Linear untuk visualisasi
+    y_regresi_line = beta_intercept_star + beta_slope * X_sorted
 
     # Plot Garis Regresi: y = beta[0] + beta[1]*x
-    ax.plot(X, y_pred, color='red', 
-            label=f'Regresi: y = {beta[0]:.2f} + {beta[1]:.2f}x')
+    ax.plot(X_sorted, y_regresi_line, color='red', 
+            label=f'Regresi: y = {beta_intercept_star:.2f} + {beta_slope:.2f}x')
 
     ax.set_xlabel('Variabel X')
     ax.set_ylabel('Variabel Y')
-    ax.set_title('Regresi Linear Sederhana')
+    ax.set_title('Regresi Linear Sederhana (Representasi 2D)')
     ax.legend()
 
     # Konversi ke Base64
@@ -80,7 +84,30 @@ def calculate():
     # 4. Visualisasi dan export csv (JALUR SUKSES)
     # NOTE: Saat Multiple Regression, X_original adalah (N, >1) dimensi. 
     # create_plot hanya bisa menerima 1D array. Kita pakai fitur pertama (kolom X1) untuk plotting
-    plot_url = create_plot(X_original[:, 0].flatten(), y_processed, y_pred, beta)
+    plot_feature_index_in_X_original = 0
+    beta_index_for_plot = plot_feature_index_in_X_original + 1 # beta[1] adalah koefisien untuk X1
+
+    # 2. Hitung Intercept yang Diperbaiki (beta_0_star)
+    beta_0_star = beta[0] # Mulai dari intercept asli
+
+    # Iterasi melalui SEMUA fitur, kecuali fitur yang diplot (index 0)
+    for i in range(X_original.shape[1]):
+    # Jika fitur saat ini BUKAN fitur yang kita plot (plot_feature_index_in_X_original)
+        if i != plot_feature_index_in_X_original:
+        # Tambahkan efek rata-rata: (Koefisien Beta * Rata-rata Kolom X)
+            avg_X_i = np.mean(X_original[:, i])
+            beta_i = beta[i + 1] # Koefisien beta dimulai dari beta[1]
+            beta_0_star += (beta_i * avg_X_i)
+
+    # 3. Panggilan create_plot menggunakan X_original[:, 0] dan Intercept yang Diperbaiki
+    X_for_plot = X_original[:, plot_feature_index_in_X_original].flatten()
+
+    plot_url = create_plot(
+        X_for_plot,
+        y_processed,
+        beta_0_star,             # <-- Kirim Intercept yang diperbaiki
+        beta[beta_index_for_plot] # <-- Kirim Koefisien Slope yang sesuai (beta[1])
+    )
 
     export_data = {
         'X_input_Fitur_Pertama': X_original[:, 0].flatten().tolist(),
