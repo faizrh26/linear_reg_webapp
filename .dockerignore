@@ -1,0 +1,15 @@
+# linear_reg_webapp/.dockerignore
+
+# Abaikan virtual environment
+venv/
+.venv/
+
+# Abaikan cache Python
+__pycache__/
+*.pyc
+
+# Abaikan file Git
+.git/
+
+# Abaikan hasil ekspor (jika ada)
+data/regresi_output.csv
