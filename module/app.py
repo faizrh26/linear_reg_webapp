@@ -8,7 +8,7 @@ from .data_handler import export_to_csv
 from .utils import read_matrix_from_file
 from .plot_utils import create_plot
 
-app = Flask(__name__, template_folder='../templates')
+app = Flask(__name__, template_folder='../templates', static_folder ='../static')
 
 @app.route('/')
 def index():

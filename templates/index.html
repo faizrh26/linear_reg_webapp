@@ -3,34 +3,43 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Input Regresi Matriks</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        textarea { width: 90%; min-height: 100px; padding: 10px; border-radius: 5px; border: 1px solid #ccc; }
-        button { padding: 10px 20px; background-color: #007bff; color: white; border: none; border-radius: 5px; cursor: pointer; }
-        button:hover { background-color: #0056b3; }
-        h1 { color: #333; }
-    </style>
+    <title>Aplikasi Regresi Matriks</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Aplikasi Regresi Linear Berbasis Matriks</h1>
-    <p>Masukkan data variabel X (fitur) dan Y (target) yang dipisahkan oleh koma.</p>
+    <div class="container">
+        <header>
+            <h1>⚙️ Regresi Linear Berbasis Matriks</h1>
+            <p class="subtitle">Analisis hubungan data multivariat menggunakan Normal Equation.</p>
+        </header>
 
-    <form method="POST" action="{{ url_for('calculate') }}" enctype="multipart/form-data">
-    
-        <label for="csv_file">Pilih File CSV Data:</label><br>
-    
-        <input type="file" id="csv_file" name="csv_file" accept=".csv" required><br><br>
-    
-        <label for="x_cols">Indeks Kolom X (Fitur):</label>
-        <input type="text" id="x_cols" name="x_cols" value="0" required placeholder="Contoh 0, 2, 3 (Untuk kolom 1,3,4)"/><br><br>
-    
-        <label for="y_col">Indeks Kolom Y (Target):</label>
-        <input type="number" id="y_col" name="y_col" value="1" required><br><br>
+        {% if error %}
+            <div class="error-message">{{ error }}</div>
+        {% endif %}
 
-        <button type="submit">Hitung dan Visualisasikan</button>
-    </form>
-    
-    <p><small>Pastikan jumlah titik data X dan Y sama untuk kalkulasi yang valid.</small></p>
+        <form action="{{ url_for('calculate') }}" method="post" enctype="multipart/form-data" class="calculation-form">
+            <h2>Data Input</h2>
+            
+            <div class="input-group">
+                <label for="csv_file">File CSV:</label>
+                <input type="file" name="csv_file" id="csv_file" required>
+            </div>
+
+            <div class="input-row">
+                <div class="input-group">
+                    <label for="x_cols">Indeks Kolom X (Fitur):</label>
+                    <input type="text" name="x_cols" id="x_cols" placeholder="Cth: 0, 1, 3" required>
+                    <small>Pisahkan dengan koma.</small>
+                </div>
+                <div class="input-group">
+                    <label for="y_col">Indeks Kolom Y (Target):</label>
+                    <input type="text" name="y_col" id="y_col" placeholder="Cth: 4" required>
+                    <small>Hanya satu indeks.</small>
+                </div>
+            </div>
+
+            <button type="submit" class="calculate-btn">Hitung Regresi</button>
+        </form>
+    </div>
 </body>
 </html>
