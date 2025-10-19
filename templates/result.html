@@ -3,50 +3,64 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Hasil Regresi</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; }
-        .error { color: red; border: 1px solid red; padding: 10px; border-radius: 5px; }
-        .success { color: green; font-weight: bold; }
-        .result-box { border: 1px solid #ddd; padding: 15px; margin-bottom: 20px; border-radius: 5px; }
-        .formula { font-size: 1.5em; font-weight: bold; color: #007bff; }
-        img { max-width: 100%; height: auto; border: 1px solid #ccc; border-radius: 5px; }
-    </style>
+    <title>Hasil Regresi Linear</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-    <h1>Hasil Kalkulasi Regresi Linear</h1>
+    <div class="container">
+        <header>
+            <h1>✅ Hasil Kalkulasi Regresi Linear</h1>
+            <a href="{{ url_for('index') }}" class="subtitle back-link">← Kembali ke Input</a>
+        </header>
 
-    {% if error %}
-        <div class="error">
-            <h2>Kesalahan Kalkulasi</h2>
-            <p>Aplikasi mengalami masalah:</p>
-            <p>{{ error }}</p>
-        </div>
-    {% else %}
-    <div class="result-box">
-            <h2>Persamaan Regresi yang Didapatkan</h2>
-            <p class="formula">{{ rumus_regresi }}</p>
+        {% if error %}
+            <div class="error-message">
+                <h2>Kesalahan Kalkulasi</h2>
+                Aplikasi mengalami masalah: {{ error }}
+            </div>
+        {% else %}
+            <div class="result-section">
+                
+                <h2>Persamaan Regresi (Model Penuh)</h2>
+                <p class="equation">{{ rumus_regresi }}</p>
 
-            <p><strong>Koefisien Intercept ($\beta_0$):</strong> {{ beta_intercept|round(4) }}</p>
-            <p><strong>Koefisien Slope/X ($\beta_1$):</strong> {{ beta_slope|round(4) }}</p>
-            <p><strong>Mean Squared Error (MSE):</strong> {{ mse|round(4) }}</p>
-        </div>
+                <div class="plot-container">
+                    <h2>Visualisasi Regresi (Fitur Pertama)</h2>
+                    <img src="{{ plot_url }}" alt="Regresi Linear Plot">
+                    <small class="subtitle">Catatan: Grafik merepresentasikan hubungan Y terhadap X1, dengan efek X lainnya disesuaikan ke nilai rata-rata.</small>
+                </div>
 
-        <h2>Visualisasi Model</h2>
-        <img src="{{ plot_url }}" alt="Grafik Regresi Linear">
+                <h2>Metrik Kinerja</h2>
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Metrik</th>
+                            <th>Nilai</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Koefisien Intercept (β₀)</td>
+                            <td>{{ beta_intercept|round(4) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Koefisien Slope Awal (β₁)</td>
+                            <td>{{ beta_slope|round(4) }}</td>
+                        </tr>
+                        <tr>
+                            <td>Mean Squared Error (MSE)</td>
+                            <td>{{ mse|round(4) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
 
-        <div class="result-box">
-            <h2>Status Export CSV</h2>
-            {% if export_status %}
-                <p class="success">✅ Data berhasil diekspor ke folder data/regresi_output.csv</p>
-            {% else %}
-                <p class="error">❌ Export CSV gagal. Cek log server/izin folder.</p>
-            {% endif %}
-        </div>
-    
-    {% endif %}
-
-    <br>
-    <a href="{{ url_for('index') }}">← Hitung Data Baru</a>
+                {% if export_status %}
+                    <p class="export-status success">Data output (prediksi, aktual) berhasil diekspor ke <code>data/regresi_output.csv</code>.</p>
+                {% else %}
+                    <p class="export-status error">Gagal mengekspor data output.</p>
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
 </body>
 </html>
